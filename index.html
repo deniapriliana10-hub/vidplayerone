@@ -66,7 +66,7 @@
     <header>
         <h1>ProStream</h1>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Cari video di sini...">
+            <input type="text" id="searchInput" placeholder="Cari video di sini..." onkeyup="filterVideo()">
             <button onclick="filterVideo()">Cari</button>
         </div>
     </header>
@@ -81,7 +81,7 @@
             </div>
 
             <h3 style="margin-top:0;">Semua Video</h3>
-            <div id="loadingText">Memuat video...</div>
+            <div id="loadingText">Memuat video dari Google Sheets...</div>
             <div class="video-grid" id="videoGrid"></div>
         </div>
 
@@ -98,31 +98,50 @@
     </div>
 
     <script>
-        // MASUKKAN ID GOOGLE SHEETS ANDA DI BAWAH INI
-        const SHEET_ID = 'GANTI_DENGAN_ID_SPREADSHEET_ANDA';
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        // Tautan CSV Google Sheets milik Anda
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBasVxwifd3tXod6A3KQHdO8UHMvmoskYgiRmb0k--J52RvO8HBjBGEn2mN63UGr30dq20EQPPE6bE/pub?output=csv";
 
         let semuaVideo = [];
 
-        // Ambil data dari Google Sheets secara otomatis
+        // Fungsi untuk membaca CSV dan mengubahnya jadi Array
+        function parseCSV(text) {
+            let lines = text.split("\n");
+            let result = [];
+            
+            // Mulai dari baris ke-2 (index 1) untuk melewati nama kolom (judul, cdn_url, thumbnail)
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Memisahkan kolom berdasarkan koma, menangani jika ada teks bertanda kutip
+                let data = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                
+                let judul = data[0] ? data[0].replace(/^"|"$/g, '').trim() : '';
+                let cdn_url = data[1] ? data[1].replace(/^"|"$/g, '').trim() : '';
+                let thumbnail = data[2] ? data[2].replace(/^"|"$/g, '').trim() : '';
+                
+                if (judul && cdn_url) {
+                    result.push({
+                        judul: judul,
+                        cdn_url: cdn_url,
+                        thumbnail: thumbnail || 'https://via.placeholder.com/600x340/222/fff?text=No+Thumb'
+                    });
+                }
+            }
+            return result;
+        }
+
+        // Ambil data dari Google Sheets
         async function ambilDataVideo() {
             try {
-                const respon = await fetch(url);
+                const respon = await fetch(csvUrl);
                 const teks = await respon.text();
-                // Membersihkan data mentah Google Sheets agar menjadi JSON murni
-                const jsonMurni = JSON.parse(teks.substr(47).slice(0, -2));
-                const baris = jsonMurni.table.rows;
-
-                semuaVideo = baris.map(item => ({
-                    judul: item.c[0] ? item.c[0].v : '',
-                    cdn_url: item.c[1] ? item.c[1].v : '',
-                    thumbnail: item.c[2] ? item.c[2].v : 'https://via.placeholder.com/600x340/222/fff?text=No+Thumb'
-                }));
+                
+                semuaVideo = parseCSV(teks);
 
                 document.getElementById('loadingText').style.display = 'none';
                 tampilkanGrid(semuaVideo);
             } catch (error) {
-                document.getElementById('loadingText').innerText = 'Gagal memuat data video.';
+                document.getElementById('loadingText').innerText = 'Gagal memuat data video. Pastikan Google Sheet sudah dipublikasikan ke web.';
                 console.error(error);
             }
         }
@@ -137,7 +156,7 @@
                 return;
             }
 
-            daftarVideo.forEach((video, index) => {
+            daftarVideo.forEach((video) => {
                 grid.innerHTML += `
                     <div class="video-card" onclick="putarVideo('${encodeURIComponent(video.judul)}', '${video.cdn_url}')">
                         <img src="${video.thumbnail}" alt="${video.judul}">
@@ -157,19 +176,18 @@
             videoPlayer.src = urlCdn;
             playerBox.style.display = 'block';
             
-            // Scroll otomatis ke player agar pengguna langsung fokus menonton
             playerBox.scrollIntoView({ behavior: 'smooth' });
             videoPlayer.play();
         }
 
-        // Fungsi Fitur Cari
+        // Fungsi Fitur Cari (Otomatis menyaring saat mengetik atau klik tombol)
         function filterVideo() {
             const kataKunci = document.getElementById('searchInput').value.toLowerCase();
             const hasilFilter = semuaVideo.filter(v => v.judul.toLowerCase().includes(kataKunci));
             tampilkanGrid(hasilFilter);
         }
 
-        // Jalankan fungsi ambil data saat web dibuka
+        // Jalankan fungsi saat web dibuka
         ambilDataVideo();
     </script>
 </body>
