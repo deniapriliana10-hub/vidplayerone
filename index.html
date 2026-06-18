@@ -1,191 +1,176 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>vidplayer one</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProStream - CDN Video Platform</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e50914;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 { margin: 0; color: #e50914; font-size: 24px; }
+        .search-container { display: flex; width: 40%; }
+        .search-container input {
+            width: 100%; padding: 10px; border: none;
+            background-color: #2b2b2b; color: white; border-radius: 4px 0 0 4px;
+        }
+        .search-container button {
+            padding: 10px 20px; border: none; background-color: #e50914;
+            color: white; cursor: pointer; border-radius: 0 4px 4px 0; font-weight: bold;
+        }
 
-<style>
-body{
-    margin:0;
-    background:#141414;
-    color:white;
-    font-family:Arial,sans-serif;
-}
+        /* Layout Utama */
+        .main-layout { display: flex; padding: 3% 5%; gap: 30px; }
+        .content-area { flex: 3; }
+        .sidebar-ads { flex: 1; min-width: 280px; }
 
-header{
-    background:#000;
-    padding:15px 25px;
-    font-size:28px;
-    color:#e50914;
-    font-weight:bold;
-}
+        /* Player Utama */
+        .player-box { background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px; display: none; }
+        video { width: 100%; display: block; aspect-ratio: 16/9; }
+        .player-info { padding: 15px; background: #1c1c1c; }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
+        /* Grid Video */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .video-card { background: #1c1c1c; border-radius: 6px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
+        .video-card:hover { transform: scale(1.04); }
+        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #2c2c2c; }
+        .video-card h4 { margin: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.player-box{
-    background:#1f1f1f;
-    border-radius:15px;
-    padding:15px;
-}
-
-video{
-    width:100%;
-    border-radius:10px;
-}
-
-.title{
-    margin-top:15px;
-    font-size:24px;
-}
-
-.controls{
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-}
-
-button{
-    background:#e50914;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:.9;
-}
-
-.list{
-    margin-top:30px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-    gap:15px;
-}
-
-.card{
-    background:#222;
-    border-radius:10px;
-    overflow:hidden;
-    cursor:pointer;
-    transition:.3s;
-}
-
-.card:hover{
-    transform:scale(1.05);
-}
-
-.card img{
-    width:100%;
-    height:130px;
-    object-fit:cover;
-}
-
-.card h3{
-    padding:10px;
-    font-size:15px;
-}
-</style>
+        /* Iklan */
+        .ad-slot { background: #1a1a1a; border: 2px dashed #444; border-radius: 8px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; margin-bottom: 20px; text-align: center; padding: 10px; }
+        
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; }
+            .search-container { width: 60%; }
+        }
+    </style>
 </head>
 <body>
 
-<header>VIDPLAYER ONE</header>
+    <header>
+        <h1>ProStream</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Cari video di sini...">
+            <button onclick="filterVideo()">Cari</button>
+        </div>
+    </header>
 
-<div class="container">
+    <div class="main-layout">
+        <div class="content-area">
+            <div class="player-box" id="playerBox">
+                <video id="mainVideoPlayer" controls autoplay></video>
+                <div class="player-info">
+                    <h2 id="playingTitle" style="margin:0; font-size:18px;"></h2>
+                </div>
+            </div>
 
-<div class="player-box">
+            <h3 style="margin-top:0;">Semua Video</h3>
+            <div id="loadingText">Memuat video...</div>
+            <div class="video-grid" id="videoGrid"></div>
+        </div>
 
-<video id="player" controls autoplay></video>
+        <div class="sidebar-ads">
+            <div class="ad-slot">
+                <strong>SLOT IKLAN 1 (300x250)</strong>
+                <p style="font-size:12px;">Pasang kode Google AdSense atau Banner di sini</p>
+            </div>
+            <div class="ad-slot">
+                <strong>SLOT IKLAN 2</strong>
+                <p style="font-size:12px;">Iklan Mandiri / Sponsor</p>
+            </div>
+        </div>
+    </div>
 
-<div class="title" id="judul"></div>
+    <script>
+        // MASUKKAN ID GOOGLE SHEETS ANDA DI BAWAH INI
+        const SHEET_ID = 'GANTI_DENGAN_ID_SPREADSHEET_ANDA';
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-<div class="controls">
-<button onclick="prevVideo()">⏮PREVIOUSLY </button>
-<button onclick="nextVideo()">⏭ NEXT</button>
-</div>
+        let semuaVideo = [];
 
-</div>
+        // Ambil data dari Google Sheets secara otomatis
+        async function ambilDataVideo() {
+            try {
+                const respon = await fetch(url);
+                const teks = await respon.text();
+                // Membersihkan data mentah Google Sheets agar menjadi JSON murni
+                const jsonMurni = JSON.parse(teks.substr(47).slice(0, -2));
+                const baris = jsonMurni.table.rows;
 
-<h2 style="margin-top:30px;">Koleksi Video</h2>
+                semuaVideo = baris.map(item => ({
+                    judul: item.c[0] ? item.c[0].v : '',
+                    cdn_url: item.c[1] ? item.c[1].v : '',
+                    thumbnail: item.c[2] ? item.c[2].v : 'https://via.placeholder.com/600x340/222/fff?text=No+Thumb'
+                }));
 
-<div class="list" id="videoList"></div>
+                document.getElementById('loadingText').style.display = 'none';
+                tampilkanGrid(semuaVideo);
+            } catch (error) {
+                document.getElementById('loadingText').innerText = 'Gagal memuat data video.';
+                console.error(error);
+            }
+        }
 
-</div>
+        // Tampilkan daftar video ke halaman
+        function tampilkanGrid(daftarVideo) {
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '';
 
-<script>
+            if(daftarVideo.length === 0) {
+                grid.innerHTML = '<p>Video tidak ditemukan.</p>';
+                return;
+            }
 
-let videos = [];
-let currentIndex = 0;
+            daftarVideo.forEach((video, index) => {
+                grid.innerHTML += `
+                    <div class="video-card" onclick="putarVideo('${encodeURIComponent(video.judul)}', '${video.cdn_url}')">
+                        <img src="${video.thumbnail}" alt="${video.judul}">
+                        <h4>${video.judul}</h4>
+                    </div>
+                `;
+            });
+        }
 
-fetch("videos.json")
-.then(res => res.json())
-.then(data => {
+        // Fungsi ketika video di klik untuk diputar
+        function putarVideo(judul, urlCdn) {
+            const playerBox = document.getElementById('playerBox');
+            const videoPlayer = document.getElementById('mainVideoPlayer');
+            const playingTitle = document.getElementById('playingTitle');
 
-videos = data;
+            playingTitle.innerText = decodeURIComponent(judul);
+            videoPlayer.src = urlCdn;
+            playerBox.style.display = 'block';
+            
+            // Scroll otomatis ke player agar pengguna langsung fokus menonton
+            playerBox.scrollIntoView({ behavior: 'smooth' });
+            videoPlayer.play();
+        }
 
-renderList();
-loadVideo(0);
+        // Fungsi Fitur Cari
+        function filterVideo() {
+            const kataKunci = document.getElementById('searchInput').value.toLowerCase();
+            const hasilFilter = semuaVideo.filter(v => v.judul.toLowerCase().includes(kataKunci));
+            tampilkanGrid(hasilFilter);
+        }
 
-});
-
-function loadVideo(index){
-
-currentIndex = index;
-
-document.getElementById("player").src =
-videos[index].video;
-
-document.getElementById("judul").innerText =
-videos[index].title;
-
-}
-
-function nextVideo(){
-
-if(currentIndex < videos.length - 1){
-loadVideo(currentIndex + 1);
-}
-
-}
-
-function prevVideo(){
-
-if(currentIndex > 0){
-loadVideo(currentIndex - 1);
-}
-
-}
-
-function renderList(){
-
-let html = "";
-
-videos.forEach((v,i)=>{
-
-html += `
-<div class="card" onclick="loadVideo(${i})">
-<img src="${v.thumb}">
-<h3>${v.title}</h3>
-</div>
-`;
-
-});
-
-document.getElementById("videoList").innerHTML = html;
-
-}
-
-document.addEventListener("ended",function(){
-nextVideo();
-});
-
-</script>
-
+        // Jalankan fungsi ambil data saat web dibuka
+        ambilDataVideo();
+    </script>
 </body>
 </html>
