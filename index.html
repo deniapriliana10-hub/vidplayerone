@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProStream - CDN Video Platform</title>
+    <title>VidplayerOnne - Premium CDN Video Platform</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -35,24 +35,24 @@
             color: white; cursor: pointer; border-radius: 0 4px 4px 0; font-weight: bold;
         }
 
-        /* Layout Utama */
+        /* Main Layout */
         .main-layout { display: flex; padding: 3% 5%; gap: 30px; }
         .content-area { flex: 3; }
         .sidebar-ads { flex: 1; min-width: 280px; }
 
-        /* Player Utama */
+        /* Video Player Box */
         .player-box { background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px; display: none; }
         video { width: 100%; display: block; aspect-ratio: 16/9; }
         .player-info { padding: 15px; background: #1c1c1c; }
 
-        /* Grid Video */
+        /* Video Grid */
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .video-card { background: #1c1c1c; border-radius: 6px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
         .video-card:hover { transform: scale(1.04); }
         .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #2c2c2c; }
         .video-card h4 { margin: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Iklan */
+        /* Advertising Slots */
         .ad-slot { background: #1a1a1a; border: 2px dashed #444; border-radius: 8px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; margin-bottom: 20px; text-align: center; padding: 10px; }
         
         @media (max-width: 768px) {
@@ -64,10 +64,10 @@
 <body>
 
     <header>
-        <h1>ProStream</h1>
+        <h1>VidplayerOnne</h1>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Cari video di sini..." onkeyup="filterVideo()">
-            <button onclick="filterVideo()">Cari</button>
+            <input type="text" id="searchInput" placeholder="Search videos here..." onkeyup="filterVideo()">
+            <button onclick="filterVideo()">Search</button>
         </div>
     </header>
 
@@ -80,39 +80,38 @@
                 </div>
             </div>
 
-            <h3 style="margin-top:0;">Semua Video</h3>
-            <div id="loadingText">Memuat video dari Google Sheets...</div>
+            <h3 style="margin-top:0;">All Videos</h3>
+            <div id="loadingText">Loading videos from Google Sheets...</div>
             <div class="video-grid" id="videoGrid"></div>
         </div>
 
         <div class="sidebar-ads">
             <div class="ad-slot">
-                <strong>SLOT IKLAN 1 (300x250)</strong>
-                <p style="font-size:12px;">Pasang kode Google AdSense atau Banner di sini</p>
+                <strong>ADVERTISEMENT SLOT 1 (300x250)</strong>
+                <p style="font-size:12px;">Place your Google AdSense code or Banner image here</p>
             </div>
             <div class="ad-slot">
-                <strong>SLOT IKLAN 2</strong>
-                <p style="font-size:12px;">Iklan Mandiri / Sponsor</p>
+                <strong>ADVERTISEMENT SLOT 2</strong>
+                <p style="font-size:12px;">Sponsor / Custom Ads</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Tautan CSV Google Sheets milik Anda
+        // Your Google Sheets CSV Link
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBasVxwifd3tXod6A3KQHdO8UHMvmoskYgiRmb0k--J52RvO8HBjBGEn2mN63UGr30dq20EQPPE6bE/pub?output=csv";
 
         let semuaVideo = [];
 
-        // Fungsi untuk membaca CSV dan mengubahnya jadi Array
+        // Function to parse CSV data into Array
         function parseCSV(text) {
             let lines = text.split("\n");
             let result = [];
             
-            // Mulai dari baris ke-2 (index 1) untuk melewati nama kolom (judul, cdn_url, thumbnail)
+            // Start from row 2 (index 1) to skip table headers
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i].trim()) continue;
                 
-                // Memisahkan kolom berdasarkan koma, menangani jika ada teks bertanda kutip
                 let data = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 
                 let judul = data[0] ? data[0].replace(/^"|"$/g, '').trim() : '';
@@ -130,7 +129,7 @@
             return result;
         }
 
-        // Ambil data dari Google Sheets
+        // Fetch data from Google Sheets
         async function ambilDataVideo() {
             try {
                 const respon = await fetch(csvUrl);
@@ -141,18 +140,18 @@
                 document.getElementById('loadingText').style.display = 'none';
                 tampilkanGrid(semuaVideo);
             } catch (error) {
-                document.getElementById('loadingText').innerText = 'Gagal memuat data video. Pastikan Google Sheet sudah dipublikasikan ke web.';
+                document.getElementById('loadingText').innerText = 'Failed to load video data. Please ensure your Google Sheet is published to the web.';
                 console.error(error);
             }
         }
 
-        // Tampilkan daftar video ke halaman
+        // Display video cards into grid
         function tampilkanGrid(daftarVideo) {
             const grid = document.getElementById('videoGrid');
             grid.innerHTML = '';
 
             if(daftarVideo.length === 0) {
-                grid.innerHTML = '<p>Video tidak ditemukan.</p>';
+                grid.innerHTML = '<p>No videos found.</p>';
                 return;
             }
 
@@ -166,7 +165,7 @@
             });
         }
 
-        // Fungsi ketika video di klik untuk diputar
+        // Play video when card is clicked
         function putarVideo(judul, urlCdn) {
             const playerBox = document.getElementById('playerBox');
             const videoPlayer = document.getElementById('mainVideoPlayer');
@@ -180,14 +179,14 @@
             videoPlayer.play();
         }
 
-        // Fungsi Fitur Cari (Otomatis menyaring saat mengetik atau klik tombol)
+        // Filter/Search video functionality
         function filterVideo() {
             const kataKunci = document.getElementById('searchInput').value.toLowerCase();
             const hasilFilter = semuaVideo.filter(v => v.judul.toLowerCase().includes(kataKunci));
             tampilkanGrid(hasilFilter);
         }
 
-        // Jalankan fungsi saat web dibuka
+        // Initialize fetching on page load
         ambilDataVideo();
     </script>
 </body>
