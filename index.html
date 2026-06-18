@@ -35,8 +35,28 @@
             color: white; cursor: pointer; border-radius: 0 4px 4px 0; font-weight: bold;
         }
 
+        /* Top Ad Banner Area */
+        .top-ad-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 5% 0 5%;
+        }
+        .ad-leaderboard {
+            background: #1a1a1a;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            width: 728px;
+            min-height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
         /* Main Layout */
-        .main-layout { display: flex; padding: 3% 5%; gap: 30px; }
+        .main-layout { display: flex; padding: 2% 5% 3% 5%; gap: 30px; }
         .content-area { flex: 3; }
         .sidebar-ads { flex: 1; min-width: 280px; }
 
@@ -55,11 +75,12 @@
         .video-card h4 { margin: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Advertising Slots */
-        .ad-slot { background: #1a1a1a; border: 2px dashed #444; border-radius: 8px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; margin-bottom: 20px; text-align: center; padding: 10px; }
+        .ad-slot { background: #1a1a1a; border: 2px dashed #444; border-radius: 8px; min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; margin-bottom: 20px; text-align: center; padding: 10px; }
         
         @media (max-width: 768px) {
             .main-layout { flex-direction: column; }
             .search-container { width: 60%; }
+            .ad-leaderboard { width: 100%; min-height: 90px; } /* Menyesuaikan layar HP */
         }
     </style>
 </head>
@@ -73,13 +94,28 @@
         </div>
     </header>
 
+    <div class="top-ad-container">
+        <div class="ad-leaderboard">
+            <script>
+                atOptions = {
+                    'key' : 'da248379499f0cf0ae179c389e6d5dcf',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://momrollback.com/da248379499f0cf0ae179c389e6d5dcf/invoke.js"></script>
+        </div>
+    </div>
+
     <div class="main-layout">
         <div class="content-area">
             <div class="player-box" id="playerBox">
                 <video id="mainVideoPlayer" controls autoplay></video>
                 <div class="player-info">
                     <h2 id="playingTitle" style="margin:0; font-size:18px;"></h2>
-                    <button class="share-btn" onclick="salinLink Video()">Copy Link</button>
+                    <button class="share-btn" onclick="salinLinkVideo()">Copy Link</button>
                 </div>
             </div>
 
@@ -90,9 +126,18 @@
 
         <div class="sidebar-ads">
             <div class="ad-slot">
-                <strong>ADVERTISEMENT SLOT 1 (300x250)</strong>
-                <p style="font-size:12px;">Place your Google AdSense code or Banner image here</p>
+                <script>
+                    atOptions = {
+                        'key' : 'f8d067b8c0219dbeaaf54694a2222748',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://momrollback.com/f8d067b8c0219dbeaaf54694a2222748/invoke.js"></script>
             </div>
+
             <div class="ad-slot">
                 <strong>ADVERTISEMENT SLOT 2</strong>
                 <p style="font-size:12px;">Sponsor / Custom Ads</p>
@@ -112,7 +157,6 @@
                 document.getElementById('loadingText').style.display = 'none';
                 tampilkanGrid(semuaVideo);
 
-                // CEK APAKAH ADA PARAMETER VIDEO DI URL LINK SAAT PERTAMA DIBUKA
                 cekParameterUrl();
             } catch (error) {
                 document.getElementById('loadingText').innerText = 'Failed to load video data.';
@@ -139,21 +183,17 @@
             });
         }
 
-        // Fungsi pemicu ketika kartu video diklik (mengubah URL browser)
         function pilihVideo(judulTerencode) {
             const judul = decodeURIComponent(judulTerencode);
-            // Ubah link di browser tanpa reload halaman
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?v=' + judulTerencode;
             window.history.pushState({path:newUrl}, '', newUrl);
             
-            // Cari data video berdasarkan judul untuk diputar
             const video = semuaVideo.find(v => v.judul === judul);
             if(video) {
                 eksekusiPutar(video.judul, video.cdn_url);
             }
         }
 
-        // Fungsi internal untuk memutar video di player
         function eksekusiPutar(judul, urlCdn) {
             const playerBox = document.getElementById('playerBox');
             const videoPlayer = document.getElementById('mainVideoPlayer');
@@ -167,7 +207,6 @@
             videoPlayer.play();
         }
 
-        // Fungsi mengecek link ketika orang lain membuka link share-an
         function cekParameterUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             const videoJudul = urlParams.get('v');
@@ -181,7 +220,6 @@
             }
         }
 
-        // Fungsi tombol "Copy Link" untuk mempermudah share
         function salinLinkVideo() {
             navigator.clipboard.writeText(window.location.href);
             alert("Video link copied to clipboard! You can share it now.");
