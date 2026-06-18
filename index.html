@@ -35,30 +35,36 @@
             color: white; cursor: pointer; border-radius: 0 4px 4px 0; font-weight: bold;
         }
 
-        /* Top Ad Banner Area */
+        /* Area Iklan Atas */
         .top-ad-container {
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px 5% 0 5%;
-        }
-        .ad-leaderboard {
-            background: #1a1a1a;
-            border: 2px dashed #444;
-            border-radius: 8px;
-            width: 728px;
-            min-height: 90px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            overflow: hidden; /* Mencegah iklan merusak layout di HP */
         }
 
-        /* Main Layout */
-        .main-layout { display: flex; padding: 2% 5% 3% 5%; gap: 30px; }
-        .content-area { flex: 3; }
-        .sidebar-ads { flex: 1; min-width: 280px; }
+        /* Layout Utama (Bawah Player/Iklan Atas) */
+        .main-layout { 
+            display: flex; 
+            padding: 2% 5% 3% 5%; 
+            gap: 30px; 
+        }
+        
+        /* Konten Kiri (Player & Daftar Video) */
+        .content-area { 
+            flex: 3; 
+        }
+        
+        /* Konten Kanan (Tempat Iklan 320x50) */
+        .sidebar-ads { 
+            flex: 1; 
+            min-width: 320px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
 
         /* Video Player Box */
         .player-box { background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px; display: none; }
@@ -73,14 +79,11 @@
         .video-card:hover { transform: scale(1.04); }
         .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #2c2c2c; }
         .video-card h4 { margin: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Advertising Slots */
-        .ad-slot { background: #1a1a1a; border: 2px dashed #444; border-radius: 8px; min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; margin-bottom: 20px; text-align: center; padding: 10px; }
         
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .main-layout { flex-direction: column; }
             .search-container { width: 60%; }
-            .ad-leaderboard { width: 100%; min-height: 90px; } /* Menyesuaikan layar HP */
+            .sidebar-ads { min-width: 100%; }
         }
     </style>
 </head>
@@ -95,21 +98,20 @@
     </header>
 
     <div class="top-ad-container">
-        <div class="ad-leaderboard">
-            <script>
-                atOptions = {
-                    'key' : 'da248379499f0cf0ae179c389e6d5dcf',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
-            </script>
-            <script src="https://momrollback.com/da248379499f0cf0ae179c389e6d5dcf/invoke.js"></script>
-        </div>
+        <script>
+            atOptions = {
+                'key' : 'da248379499f0cf0ae179c389e6d5dcf',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+            };
+        </script>
+        <script src="https://momrollback.com/da248379499f0cf0ae179c389e6d5dcf/invoke.js"></script>
     </div>
 
     <div class="main-layout">
+        
         <div class="content-area">
             <div class="player-box" id="playerBox">
                 <video id="mainVideoPlayer" controls autoplay></video>
@@ -125,7 +127,7 @@
         </div>
 
         <div class="sidebar-ads">
-            <div class="ad-slot">
+            <div>
                 <script>
                     atOptions = {
                         'key' : 'f8d067b8c0219dbeaaf54694a2222748',
@@ -137,12 +139,8 @@
                 </script>
                 <script src="https://momrollback.com/f8d067b8c0219dbeaaf54694a2222748/invoke.js"></script>
             </div>
-
-            <div class="ad-slot">
-                <strong>ADVERTISEMENT SLOT 2</strong>
-                <p style="font-size:12px;">Sponsor / Custom Ads</p>
-            </div>
         </div>
+
     </div>
 
     <script>
