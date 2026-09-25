@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Adsterra Statistics</title>
+
+<script src="config.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#f3f4f6;
+    font-family:Arial,sans-serif;
+    color:#111827;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.header{
+    background:#111827;
+    color:white;
+    padding:25px;
+    border-radius:18px;
+    margin-bottom:20px;
+}
+
+.header h1{
+    margin:0;
+    font-size:25px;
+}
+
+.header p{
+    margin:7px 0 0;
+    opacity:.7;
+}
+
+.box{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.form{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:12px;
+}
+
+label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+input,button{
+    width:100%;
+    height:45px;
+    border-radius:10px;
+    border:1px solid #d1d5db;
+    padding:0 12px;
+}
+
+button{
+    background:#111827;
+    color:white;
+    border:0;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:18px;
+}
+
+button:disabled{
+    opacity:.5;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.stat{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.stat small{
+    color:#6b7280;
+}
+
+.stat strong{
+    display:block;
+    font-size:22px;
+    margin-top:7px;
+}
+
+.table{
+    overflow:auto;
+}
+
+table{
+    width:100%;
+    min-width:700px;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:13px 10px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+}
+
+th{
+    font-size:12px;
+    color:#6b7280;
+}
+
+.revenue{
+    font-weight:bold;
+}
+
+#status{
+    margin-top:12px;
+    font-size:13px;
+}
+
+.error{
+    color:#dc2626;
+}
+
+.success{
+    color:#16a34a;
+}
+
+@media(max-width:700px){
+
+    .form{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .form button{
+        grid-column:1/-1;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Adsterra Statistics</h1>
+        <p>Statistik revenue berdasarkan Direct / Placement</p>
+    </div>
+
+    <div class="box">
+
+        <div class="form">
+
+            <div>
+                <label>DARI TANGGAL</label>
+                <input type="date" id="start">
+            </div>
+
+            <div>
+                <label>SAMPAI TANGGAL</label>
+                <input type="date" id="finish">
+            </div>
+
+            <div>
+                <label>&nbsp;</label>
+                <button id="check">
+                    CEK STATISTIK
+                </button>
+            </div>
+
+        </div>
+
+        <div id="status"></div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+            <small>Total Revenue</small>
+            <strong id="revenue">$0.0000</strong>
+        </div>
+
+        <div class="stat">
+            <small>Impressions</small>
+            <strong id="impressions">0</strong>
+        </div>
+
+        <div class="stat">
+            <small>Clicks</small>
+            <strong id="clicks">0</strong>
+        </div>
+
+        <div class="stat">
+            <small>CTR</small>
+            <strong id="ctr">0%</strong>
+        </div>
+
+    </div>
+
+
+    <div class="box table">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>DIRECT / PLACEMENT</th>
+                    <th>IMPRESSIONS</th>
+                    <th>CLICKS</th>
+                    <th>CTR</th>
+                    <th>CPM</th>
+                    <th>REVENUE</th>
+                </tr>
+            </thead>
+
+            <tbody id="result">
+
+                <tr>
+                    <td colspan="6">
+                        Silakan pilih tanggal kemudian klik CEK STATISTIK.
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const startInput = document.getElementById("start");
+const finishInput = document.getElementById("finish");
+const button = document.getElementById("check");
+const statusBox = document.getElementById("status");
+const result = document.getElementById("result");
+
+
+// =============================
+// DEFAULT TANGGAL 7 HARI
+// =============================
+
+const today = new Date();
+
+function formatDate(date){
+
+    return date.toISOString().split("T")[0];
+
+}
+
+finishInput.value = formatDate(today);
+
+const sevenDaysAgo = new Date(today);
+
+sevenDaysAgo.setDate(
+    sevenDaysAgo.getDate() - 6
+);
+
+startInput.value = formatDate(sevenDaysAgo);
+
+
+// =============================
+// AMBIL NILAI
+// =============================
+
+function getNumber(obj, names){
+
+    for(const name of names){
+
+        if(
+            obj[name] !== undefined &&
+            obj[name] !== null
+        ){
+
+            return Number(obj[name]) || 0;
+
+        }
+
+    }
+
+    return 0;
+}
+
+
+function getText(obj,names){
+
+    for(const name of names){
+
+        if(
+            obj[name] !== undefined &&
+            obj[name] !== null
+        ){
+
+            return obj[name];
+
+        }
+
+    }
+
+    return "Unknown";
+}
+
+
+// =============================
+// AMBIL ARRAY DATA
+// =============================
+
+function getData(data){
+
+    if(Array.isArray(data))
+        return data;
+
+    if(Array.isArray(data.data))
+        return data.data;
+
+    if(Array.isArray(data.results))
+        return data.results;
+
+    if(Array.isArray(data.stats))
+        return data.stats;
+
+    return [];
+
+}
+
+
+// =============================
+// CEK STATISTIK
+// =============================
+
+button.addEventListener("click", async function(){
+
+    const start = startInput.value;
+    const finish = finishInput.value;
+
+
+    if(!ADSTERRA_API_KEY ||
+       ADSTERRA_API_KEY === "MASUKKAN_API_KEY_ADSTERRA_DISINI"){
+
+        statusBox.className = "error";
+
+        statusBox.innerText =
+            "API Key belum dimasukkan di config.js.";
+
+        return;
+
+    }
+
+
+    if(!start || !finish){
+
+        statusBox.className = "error";
+
+        statusBox.innerText =
+            "Silakan pilih tanggal.";
+
+        return;
+
+    }
+
+
+    if(start > finish){
+
+        statusBox.className = "error";
+
+        statusBox.innerText =
+            "Tanggal awal tidak boleh lebih besar.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.innerText = "LOADING...";
+
+    statusBox.className = "";
+
+    statusBox.innerText =
+        "Mengambil data Adsterra...";
+
+
+    try{
+
+        const params = new URLSearchParams();
+
+        params.append("start_date",start);
+
+        params.append("finish_date",finish);
+
+        params.append(
+            "group_by[]",
+            "placement_sub_id"
+        );
+
+
+        const url =
+            "https://api3.adsterratools.com/publisher/stats.json?"
+            + params.toString();
+
+
+        const response = await fetch(
+
+            url,
+
+            {
+                method:"GET",
+
+                headers:{
+                    "Accept":"application/json",
+                    "X-API-Key":ADSTERRA_API_KEY
+                }
+            }
+
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                "HTTP " + response.status
+            );
+
+        }
+
+
+        const rows = getData(data);
+
+
+        result.innerHTML = "";
+
+
+        let totalRevenue = 0;
+        let totalImpressions = 0;
+        let totalClicks = 0;
+
+
+        if(rows.length === 0){
+
+            result.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        Tidak ada data pada periode tersebut.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+
+        rows.forEach(item => {
+
+            const impressions =
+                getNumber(
+                    item,
+                    ["impressions","impression"]
+                );
+
+
+            const clicks =
+                getNumber(
+                    item,
+                    ["clicks","click"]
+                );
+
+
+            const revenue =
+                getNumber(
+                    item,
+                    [
+                        "revenue",
+                        "earnings",
+                        "earning"
+                    ]
+                );
+
+
+            const direct =
+                getText(
+                    item,
+                    [
+                        "placement_sub_id",
+                        "placementSubId",
+                        "sub_id",
+                        "subid",
+                        "placement"
+                    ]
+                );
+
+
+            const ctr =
+                impressions > 0
+                ? (clicks / impressions) * 100
+                : 0;
+
+
+            const cpm =
+                impressions > 0
+                ? (revenue / impressions) * 1000
+                : 0;
+
+
+            totalRevenue += revenue;
+
+            totalImpressions += impressions;
+
+            totalClicks += clicks;
+
+
+            result.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${String(direct)
+                            .replace(/[<>&"]/g,"")}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${impressions.toLocaleString("id-ID")}
+                    </td>
+
+                    <td>
+                        ${clicks.toLocaleString("id-ID")}
+                    </td>
+
+                    <td>
+                        ${ctr.toFixed(2)}%
+                    </td>
+
+                    <td>
+                        $${cpm.toFixed(4)}
+                    </td>
+
+                    <td class="revenue">
+                        $${revenue.toFixed(4)}
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+        const totalCtr =
+            totalImpressions > 0
+            ? (totalClicks / totalImpressions) * 100
+            : 0;
+
+
+        document.getElementById("revenue").innerText =
+            "$" + totalRevenue.toFixed(4);
+
+
+        document.getElementById("impressions").innerText =
+            totalImpressions.toLocaleString("id-ID");
+
+
+        document.getElementById("clicks").innerText =
+            totalClicks.toLocaleString("id-ID");
+
+
+        document.getElementById("ctr").innerText =
+            totalCtr.toFixed(2) + "%";
+
+
+        statusBox.className = "success";
+
+        statusBox.innerText =
+            "Berhasil: " + start +
+            " sampai " + finish;
+
+
+    }catch(error){
+
+        statusBox.className = "error";
+
+        statusBox.innerText =
+            "Gagal mengambil data: " +
+            error.message;
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText = "CEK STATISTIK";
+
+});
+
+</script>
+
+</body>
+</html>
