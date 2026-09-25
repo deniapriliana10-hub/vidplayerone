@@ -2,314 +2,840 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Adsterra Statistics</title>
 
 <style>
-body{
-  font-family:Arial,sans-serif;
-  background:#f4f6f8;
-  margin:0;
-  padding:20px;
-  color:#222;
-}
-.container{
-  max-width:1000px;
-  margin:auto;
-}
-h1{margin-bottom:20px}
-.filters{
-  background:white;
-  padding:18px;
-  border-radius:12px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-input,button{
-  padding:11px;
-  border-radius:7px;
-  border:1px solid #ddd;
-}
-button{
-  background:#111;
-  color:white;
-  cursor:pointer;
-  border:0;
-}
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:20px;
-}
-.card{
-  background:white;
-  padding:18px;
-  border-radius:12px;
-}
-.card small{color:#777}
-.card strong{
-  display:block;
-  font-size:22px;
-  margin-top:8px;
-}
-.table-box{
-  background:white;
-  border-radius:12px;
-  overflow:auto;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-th,td{
-  padding:12px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-}
-.error{
-  background:#ffe5e5;
-  color:#b00000;
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:15px;
-  display:none;
+* {
+  box-sizing: border-box;
 }
 
-@media(max-width:700px){
-  .cards{grid-template-columns:repeat(2,1fr)}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  color: #222;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+.filter {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+button {
+  border: 0;
+  background: #2563eb;
+  color: white;
+  padding: 11px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: end;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.card-title {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.section h2 {
+  margin-top: 0;
+  font-size: 19px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th,
+td {
+  padding: 11px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #f8fafc;
+}
+
+.number {
+  text-align: right;
+}
+
+.status {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.loading {
+  color: #2563eb;
+}
+
+.empty {
+  color: #777;
+}
+
+@media (max-width: 800px) {
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 450px) {
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 </head>
 
 <body>
 
+<div class="header">
+  <div class="container">
+    <h1>Adsterra Statistics</h1>
+  </div>
+</div>
+
 <div class="container">
 
-<h1>Adsterra Statistics</h1>
+  <div class="filter">
 
-<div class="filters">
-  <label>
-    Dari<br>
-    <input type="date" id="startDate">
-  </label>
+    <div class="filter-grid">
 
-  <label>
-    Sampai<br>
-    <input type="date" id="finishDate">
-  </label>
+      <div>
+        <label>Dari tanggal</label>
+        <input type="date" id="startDate">
+      </div>
 
-  <button onclick="loadStats()">CEK STATISTIK</button>
-</div>
+      <div>
+        <label>Sampai tanggal</label>
+        <input type="date" id="finishDate">
+      </div>
 
-<div id="error" class="error"></div>
+      <button onclick="loadStatistics()">
+        CEK STATISTIK
+      </button>
 
-<div class="cards">
-  <div class="card">
-    <small>Total Revenue</small>
-    <strong id="revenue">$0.00</strong>
+    </div>
+
+    <div id="status" class="status"></div>
+
   </div>
 
-  <div class="card">
-    <small>Impressions</small>
-    <strong id="impressions">0</strong>
+
+  <!-- TOTAL -->
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-title">Total Revenue</div>
+      <div class="card-value" id="totalRevenue">$0.000</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Impressions</div>
+      <div class="card-value" id="totalImpression">0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Clicks</div>
+      <div class="card-value" id="totalClicks">0</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CTR</div>
+      <div class="card-value" id="totalCTR">0%</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CPM</div>
+      <div class="card-value" id="totalCPM">$0.000</div>
+    </div>
+
   </div>
 
-  <div class="card">
-    <small>Clicks</small>
-    <strong id="clicks">0</strong>
+
+  <!-- DAILY -->
+
+  <div class="section">
+
+    <h2>STATISTIK HARIAN</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th class="number">Impressions</th>
+            <th class="number">Clicks</th>
+            <th class="number">CTR</th>
+            <th class="number">CPM</th>
+            <th class="number">Revenue</th>
+          </tr>
+        </thead>
+
+        <tbody id="dailyTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
   </div>
 
-  <div class="card">
-    <small>CTR</small>
-    <strong id="ctr">0%</strong>
+
+  <!-- PLACEMENT -->
+
+  <div class="section">
+
+    <h2>DIRECT / PLACEMENT</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Placement</th>
+            <th class="number">Impressions</th>
+            <th class="number">Clicks</th>
+            <th class="number">CTR</th>
+            <th class="number">CPM</th>
+            <th class="number">Revenue</th>
+          </tr>
+        </thead>
+
+        <tbody id="placementTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
   </div>
+
+
+  <!-- SUB ID -->
+
+  <div class="section">
+
+    <h2>SMARTLINK / SUB-ID</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Sub-ID</th>
+            <th class="number">Impressions</th>
+            <th class="number">Clicks</th>
+            <th class="number">CTR</th>
+            <th class="number">CPM</th>
+            <th class="number">Revenue</th>
+          </tr>
+        </thead>
+
+        <tbody id="subidTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div class="table-box">
-<table>
-<thead>
-<tr>
-  <th>Placement / Sub ID</th>
-  <th>Revenue</th>
-  <th>Impressions</th>
-  <th>Clicks</th>
-  <th>CTR</th>
-</tr>
-</thead>
-
-<tbody id="tableBody">
-<tr>
-  <td colspan="5">Pilih tanggal lalu tekan CEK STATISTIK</td>
-</tr>
-</tbody>
-
-</table>
-</div>
-
-</div>
 
 <script>
 
 const WORKER_URL =
-"https://adstera-api.deniapriliana10.workers.dev/";
+"https://adsterra-api.akupulang643.workers.dev";
 
-const startInput = document.getElementById("startDate");
-const finishInput = document.getElementById("finishDate");
 
-const today = new Date();
-const weekAgo = new Date();
-weekAgo.setDate(today.getDate() - 6);
+const startInput =
+document.getElementById("startDate");
 
-function formatDate(date){
-  return date.toISOString().split("T")[0];
+const finishInput =
+document.getElementById("finishDate");
+
+
+// Default tanggal
+const today =
+new Date();
+
+const year =
+today.getFullYear();
+
+const month =
+String(today.getMonth() + 1).padStart(2, "0");
+
+const day =
+String(today.getDate()).padStart(2, "0");
+
+const todayString =
+`${year}-${month}-${day}`;
+
+startInput.value =
+todayString;
+
+finishInput.value =
+todayString;
+
+
+function money(value) {
+
+  return "$" +
+    Number(value || 0).toFixed(3);
+
 }
 
-startInput.value = formatDate(weekAgo);
-finishInput.value = formatDate(today);
+
+function number(value) {
+
+  return Number(value || 0)
+    .toLocaleString("en-US");
+
+}
 
 
-async function loadStats(){
+function percent(value) {
 
-  const start = startInput.value;
-  const finish = finishInput.value;
+  return Number(value || 0)
+    .toFixed(2) + "%";
 
-  const errorBox = document.getElementById("error");
+}
 
-  errorBox.style.display = "none";
 
-  if(!start || !finish){
-    errorBox.textContent = "Silakan pilih tanggal terlebih dahulu.";
-    errorBox.style.display = "block";
-    return;
+function getRows(data) {
+
+  if (Array.isArray(data)) {
+    return data;
   }
 
-  document.getElementById("tableBody").innerHTML =
-    "<tr><td colspan='5'>Mengambil data...</td></tr>";
+  if (Array.isArray(data.items)) {
+    return data.items;
+  }
 
-  try{
+  if (Array.isArray(data.data)) {
+    return data.data;
+  }
 
-    const url =
-      WORKER_URL +
-      "?start_date=" +
-      encodeURIComponent(start) +
-      "&finish_date=" +
-      encodeURIComponent(finish);
+  return [];
 
-    const response = await fetch(url);
+}
 
-    const data = await response.json();
 
-    if(!response.ok){
-      throw new Error(
-        data.error || data.message || "Gagal mengambil data"
+function getImpression(row) {
+
+  return Number(
+    row.impression ??
+    row.impressions ??
+    0
+  );
+
+}
+
+
+function getClicks(row) {
+
+  return Number(
+    row.clicks ?? 0
+  );
+
+}
+
+
+function getCTR(row) {
+
+  return Number(
+    row.ctr ?? 0
+  );
+
+}
+
+
+function getCPM(row) {
+
+  return Number(
+    row.cpm ?? 0
+  );
+
+}
+
+
+function getRevenue(row) {
+
+  return Number(
+    row.revenue ?? 0
+  );
+
+}
+
+
+function getName(row, type) {
+
+  if (type === "date") {
+
+    return (
+      row.date ??
+      row.day ??
+      row.datetime ??
+      "-"
+    );
+
+  }
+
+  if (type === "placement") {
+
+    return (
+      row.placement ??
+      row.placement_name ??
+      row.placement_id ??
+      "-"
+    );
+
+  }
+
+  if (type === "subid") {
+
+    return (
+      row.placement_sub_id ??
+      "-"
+    );
+
+  }
+
+  return "-";
+
+}
+
+
+function createRow(row, type) {
+
+  const tr =
+  document.createElement("tr");
+
+  tr.innerHTML = `
+
+    <td>
+      ${getName(row, type)}
+    </td>
+
+    <td class="number">
+      ${number(getImpression(row))}
+    </td>
+
+    <td class="number">
+      ${number(getClicks(row))}
+    </td>
+
+    <td class="number">
+      ${percent(getCTR(row))}
+    </td>
+
+    <td class="number">
+      ${money(getCPM(row))}
+    </td>
+
+    <td class="number">
+      ${money(getRevenue(row))}
+    </td>
+
+  `;
+
+  return tr;
+
+}
+
+
+async function getStats(start, finish, group) {
+
+  const url =
+    WORKER_URL +
+    "?start_date=" +
+    encodeURIComponent(start) +
+    "&finish_date=" +
+    encodeURIComponent(finish) +
+    "&group=" +
+    encodeURIComponent(group);
+
+  const response =
+    await fetch(url);
+
+  if (!response.ok) {
+
+    throw new Error(
+      "HTTP " + response.status
+    );
+
+  }
+
+  return await response.json();
+
+}
+
+
+async function loadStatistics() {
+
+  const start =
+    startInput.value;
+
+  const finish =
+    finishInput.value;
+
+  const status =
+    document.getElementById("status");
+
+  if (!start || !finish) {
+
+    status.innerHTML =
+      '<span class="error">Tanggal belum lengkap.</span>';
+
+    return;
+
+  }
+
+  status.innerHTML =
+    '<span class="loading">Mengambil data Adsterra...</span>';
+
+
+  try {
+
+    // Ambil 3 laporan
+    const dailyData =
+      await getStats(
+        start,
+        finish,
+        "date"
       );
+
+
+    const placementData =
+      await getStats(
+        start,
+        finish,
+        "placement"
+      );
+
+
+    const subidData =
+      await getStats(
+        start,
+        finish,
+        "subid"
+      );
+
+
+    const dailyRows =
+      getRows(dailyData);
+
+    const placementRows =
+      getRows(placementData);
+
+    const subidRows =
+      getRows(subidData);
+
+
+    // ==========================
+    // TOTAL DARI DATA HARIAN
+    // ==========================
+
+    let totalRevenue = 0;
+    let totalImpression = 0;
+    let totalClicks = 0;
+
+    dailyRows.forEach(row => {
+
+      totalRevenue +=
+        getRevenue(row);
+
+      totalImpression +=
+        getImpression(row);
+
+      totalClicks +=
+        getClicks(row);
+
+    });
+
+
+    let totalCTR = 0;
+
+    if (totalImpression > 0) {
+
+      totalCTR =
+        (totalClicks /
+        totalImpression) * 100;
+
     }
 
-    renderStats(data);
 
-  }catch(error){
+    let totalCPM = 0;
+
+    if (totalImpression > 0) {
+
+      totalCPM =
+        (totalRevenue /
+        totalImpression) * 1000;
+
+    }
+
+
+    document.getElementById(
+      "totalRevenue"
+    ).textContent =
+      money(totalRevenue);
+
+
+    document.getElementById(
+      "totalImpression"
+    ).textContent =
+      number(totalImpression);
+
+
+    document.getElementById(
+      "totalClicks"
+    ).textContent =
+      number(totalClicks);
+
+
+    document.getElementById(
+      "totalCTR"
+    ).textContent =
+      percent(totalCTR);
+
+
+    document.getElementById(
+      "totalCPM"
+    ).textContent =
+      money(totalCPM);
+
+
+    // ==========================
+    // TABLE HARIAN
+    // ==========================
+
+    const dailyTable =
+      document.getElementById(
+        "dailyTable"
+      );
+
+    dailyTable.innerHTML = "";
+
+
+    if (dailyRows.length === 0) {
+
+      dailyTable.innerHTML =
+        `<tr>
+          <td colspan="6" class="empty">
+            Tidak ada data.
+          </td>
+        </tr>`;
+
+    } else {
+
+      dailyRows.forEach(row => {
+
+        dailyTable.appendChild(
+          createRow(row, "date")
+        );
+
+      });
+
+    }
+
+
+    // ==========================
+    // TABLE PLACEMENT
+    // ==========================
+
+    const placementTable =
+      document.getElementById(
+        "placementTable"
+      );
+
+    placementTable.innerHTML = "";
+
+
+    if (placementRows.length === 0) {
+
+      placementTable.innerHTML =
+        `<tr>
+          <td colspan="6" class="empty">
+            Tidak ada data placement.
+          </td>
+        </tr>`;
+
+    } else {
+
+      placementRows.forEach(row => {
+
+        placementTable.appendChild(
+          createRow(row, "placement")
+        );
+
+      });
+
+    }
+
+
+    // ==========================
+    // TABLE SUB ID
+    // ==========================
+
+    const subidTable =
+      document.getElementById(
+        "subidTable"
+      );
+
+    subidTable.innerHTML = "";
+
+
+    if (subidRows.length === 0) {
+
+      subidTable.innerHTML =
+        `<tr>
+          <td colspan="6" class="empty">
+            Tidak ada data Sub-ID.
+          </td>
+        </tr>`;
+
+    } else {
+
+      subidRows.forEach(row => {
+
+        subidTable.appendChild(
+          createRow(row, "subid")
+        );
+
+      });
+
+    }
+
+
+    status.innerHTML =
+      `<span>
+        Data berhasil diperbarui.
+        Periode ${start} sampai ${finish}
+      </span>`;
+
+
+  } catch (error) {
 
     console.error(error);
 
-    errorBox.textContent =
-      "Gagal mengambil data: " + error.message;
+    status.innerHTML =
+      `<span class="error">
+        Gagal mengambil data:
+        ${error.message}
+      </span>`;
 
-    errorBox.style.display = "block";
-
-    document.getElementById("tableBody").innerHTML =
-      "<tr><td colspan='5'>Tidak ada data</td></tr>";
   }
+
 }
 
 
-function renderStats(data){
-
-  /*
-   * Adsterra biasanya mengembalikan data
-   * dalam property 'items'.
-   */
-
-  const rows =
-    Array.isArray(data) ? data :
-    Array.isArray(data.items) ? data.items :
-    Array.isArray(data.data) ? data.data :
-    [];
-
-  let totalRevenue = 0;
-  let totalImpressions = 0;
-  let totalClicks = 0;
-
-  const tbody = document.getElementById("tableBody");
-
-  tbody.innerHTML = "";
-
-  if(rows.length === 0){
-
-    tbody.innerHTML =
-      "<tr><td colspan='5'>Data kosong</td></tr>";
-
-  }else{
-
-    rows.forEach(row => {
-
-      const revenue =
-        Number(row.revenue ?? row.sum_revenue ?? 0);
-
-      const impressions =
-        Number(row.impressions ?? 0);
-
-      const clicks =
-        Number(row.clicks ?? 0);
-
-      const ctr =
-        impressions > 0
-        ? (clicks / impressions) * 100
-        : 0;
-
-      totalRevenue += revenue;
-      totalImpressions += impressions;
-      totalClicks += clicks;
-
-      const name =
-        row.placement_sub_id ??
-        row.placement ??
-        row.sub_id ??
-        "-";
-
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${name}</td>
-        <td>$${revenue.toFixed(4)}</td>
-        <td>${impressions.toLocaleString()}</td>
-        <td>${clicks.toLocaleString()}</td>
-        <td>${ctr.toFixed(2)}%</td>
-      `;
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  const totalCtr =
-    totalImpressions > 0
-    ? (totalClicks / totalImpressions) * 100
-    : 0;
-
-  document.getElementById("revenue").textContent =
-    "$" + totalRevenue.toFixed(4);
-
-  document.getElementById("impressions").textContent =
-    totalImpressions.toLocaleString();
-
-  document.getElementById("clicks").textContent =
-    totalClicks.toLocaleString();
-
-  document.getElementById("ctr").textContent =
-    totalCtr.toFixed(2) + "%";
-}
+// Otomatis cek ketika halaman dibuka
+loadStatistics();
 
 </script>
 
